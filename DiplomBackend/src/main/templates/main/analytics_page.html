@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Аналитика</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sancreek&family=Tinos&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Fira+Sans:wght@400;500&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
+     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="{% static 'js/forms.js' %}"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=89dcb14e-461d-4a7c-8ab5-5544d4c06f4d&lang=ru_RU">
+    </script>
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="header__inner">
+            <div class="header__logo">
+                <font size="48" color="white" face="Sancreek">HO</font>
+            </div>
+            <nav class="nav">
+                <a class="nav__link" href="{% url "home" %}">Главная</a>
+                <a class="nav__link" href="{% url "analytics" %}">Аналитика</a>
+                <a class="nav__link" href="{% url "prediction" %}">Прогнозирование</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<div class="coctail__info ">
+    <div class="container">
+        <div class="coctail__inner" style="margin-bottom: 40px;">
+            <div class="coctail__header">
+                <div class="coctail__name">Анализ имеющийся информации о гостинице</div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="selectors">
+                    <input class="form-control form_control_custom" id="hotel_id" name="hotel_id"
+                           type="text" autocomplete="off" placeholder="Введите идентификатор гостиницы" />
+
+                    <button type="button" id="identificator_btn" class="btn btn-primary btn_custom">Подтвердить</button>
+                </div>
+            </form>
+
+            <div id="result_identificator"></div>
+        </div>
+
+
+        <div class="coctail__inner" style="margin-bottom: 40px;">
+            <div class="coctail__header">
+                <div class="coctail__name">Ранжирование гостиниц относительно среднего возраста клиентов</div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="selectors">
+                    <input class="form-control form_control_custom" id="min_age" name="min_age" autocomplete="off" type="text" placeholder="Введите минимальный возраст">
+                    <input class="form-control form_control_custom" id="max_age" name="max_age" autocomplete="off" type="text" placeholder="Введите максимальный возраст">
+                    <button type="button" id="age_btn" class="btn btn-primary btn_custom">Подтвердить</button>
+                </div>
+            </form>
+
+            <div id="result_age"></div>
+            </div>
+
+         <div class="coctail__inner" style="margin-bottom: 40px;">
+            <div class="coctail__header">
+                <div class="coctail__name">Количество бронирований за определенный период</div>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="selectors selectors-date">
+                    <input id="from_date" class="form-control form_control_custom" autocomplete="off" name="from_date"
+                           type="date" placeholder="Введите дату">
+                    <input id="to_date" class="form-control form_control_custom" autocomplete="off" name="to_date"
+                           type="date" placeholder="Введите дату">
+                    <button type="button" id="date_btn" class="btn btn-primary btn_custom">Подтвердить</button>
+                </div>
+            </form>
+
+        <div id="total_block"></div>
+
+{#            <div class="single-bg">#}
+{#                <div id="chart_predict">#}
+{##}
+{#                </div>#}
+{##}
+{#            </div>#}
+        </div>
+    </div>
+</div>
+
+<div style="display: none">
+    {% for item in date_amount%}
+        <div class="actual_data">{{ item }}</div>
+    {% endfor %}
+</div>
+<div style="display: none">
+    {% for item in date%}
+        <div class="label_data">{{ item }}</div>
+    {% endfor %}
+</div>
+
+<script type="text/javascript">
+    const options = {
+      chart: {
+        height: 280,
+        type: "area"
+      },
+      dataLabels: {
+        enabled: false
+      },
+      series: [
+        {
+          name: "Актуальные данные",
+          data: Array.from(document.querySelectorAll(".date_amount")).map(item=>parseInt(item.textContent))
+        },
+      ],
+      fill: {
+        type: "gradient",
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.7,
+          opacityTo: 0.9,
+          stops: [0, 90, 100]
+        }
+      },
+      xaxis: {
+        categories: Array.from(document.querySelectorAll(".label_data")).map(item=>item.textContent)
+      }
+    };
+
+    const chart = new ApexCharts(document.querySelector("#chart_predict"), options);
+
+    chart.render();
+</script>
+</body>
+</html>

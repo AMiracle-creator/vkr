@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Прогнозирование</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sancreek&family=Tinos&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Fira+Sans:wght@400;500&display=swap"
+          rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+
+<header class="header">
+    <div class="container">
+        <div class="header__inner">
+            <div class="header__logo">
+                <font size="48" color="white" face="Sancreek">HO</font>
+            </div>
+            <nav class="nav">
+                <a class="nav__link" href="{% url "home" %}">Главная</a>
+                <a class="nav__link" href="{% url "analytics" %}">Аналитика</a>
+                <a class="nav__link" href="{% url "prediction" %}">Прогнозирование</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<div class="coctail__info">
+    <div class="container">
+        <div class="coctail__inner">
+            <div class="coctail__header">
+                <div class="coctail__name">Прогнозирование ожидаемого количества бронирований гостиниц</div>
+            </div>
+
+            <div class="single-bg">
+                <div id="chart_predict">
+
+                </div>
+
+            </div>
+
+            <div class="single__about">
+                На данном графике представлено прогнозируемое количество бронирований номеров отелей и гостиниц
+                Республики Татарстан. Данные отображают имеющиеся тенденции рынка гостиничного бизнеса, но могут
+                отличаться от реальных.
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="coctail__info">
+    <div class="container">
+        <div class="coctail__inner">
+            <div class="coctail__header">
+                <div class="coctail__name">Визуализация спроса</div>
+            </div>
+
+            <div class="single-bg1">
+                 <img class="single-bg1" src="{% static "images/heat_map.png" %}" alt="">
+            </div>
+
+            <div class="single-bg">
+                 <div id="chart_donut"></div>
+            </div>
+
+            <div class="loader__legend" style="margin-left: 400px">
+                Средний возраст мужчин составляет: 40.6
+                <br>
+                Средний возраст женщин составляет: 40.1
+            </div>
+
+            <div class="border1"></div>
+
+            <div class="single__about">
+                Для сравнения приведена тепловая карта бронирований гостиниц и отелей Республики Татарстан начиная с
+                2015 года и заканчивая 2023. Карта отлично визуализирует спрос. Также приведена круговая диаграмма,
+                отображающая возраст и пол клиентов.
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="display: none">
+    {% for item in actual_data%}
+        <div class="actual_data">{{ item }}</div>
+    {% endfor %}
+</div>
+<div style="display: none">
+    {% for item in predict_data%}
+        <div class="predict_data">{{ item }}</div>
+    {% endfor %}
+</div>
+<div style="display: none">
+    {% for item in label%}
+        <div class="label_data">{{ item }}</div>
+    {% endfor %}
+</div>
+
+
+<script type="text/javascript">
+    const options = {
+      chart: {
+        height: 280,
+        type: "area"
+      },
+      dataLabels: {
+        enabled: false
+      },
+      series: [
+        {
+          name: "Актуальные данные",
+          data: Array.from(document.querySelectorAll(".actual_data")).map(item=>parseInt(item.textContent))
+        },
+      ],
+      fill: {
+        type: "gradient",
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.7,
+          opacityTo: 0.9,
+          stops: [0, 90, 100]
+        }
+      },
+      xaxis: {
+        categories: Array.from(document.querySelectorAll(".label_data")).map(item=>item.textContent)
+      }
+    };
+
+    const chart = new ApexCharts(document.querySelector("#chart_predict"), options);
+
+    chart.render();
+</script>
+
+<script type="text/javascript">
+     const param = {
+          series: [53, 47],
+          chart: {
+          width: 380,
+          type: 'pie',
+        },
+        labels: ['Мужчин', 'Женщин'],
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+     };
+
+     const graph = new ApexCharts(document.querySelector("#chart_donut"), param);
+     graph.render();
+</script>
+</body>
+</html>
